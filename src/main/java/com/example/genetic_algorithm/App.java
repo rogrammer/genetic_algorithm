@@ -24,8 +24,10 @@ public class App extends Application {
                     rectangles[i][j] = input.nextInt();
                 }
             }
-            Genetic genetic = new Genetic(rectangles, 80, 80);
+            Genetic genetic = new Genetic(rectangles, 150, 150);
             Grids g = genetic.solve();
+            System.out.println(genetic.fitness(g));
+
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("view.fxml"));
             Parent root = fxmlLoader.load();
 //        Group group = new Group();

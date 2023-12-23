@@ -8,7 +8,6 @@ public class Genetic {
     private final int selectionAmount = 10;
     private int[][] rectangles;
     private int size;
-    private int bestArea;
     private int xgrid;
     private int ygrid;
     private int smallestX;
@@ -19,29 +18,27 @@ public class Genetic {
         size = rectangles.length;
         xgrid = x;
         ygrid = y;
-        bestArea = 0;
         smallestX = Integer.MAX_VALUE;
         smallestY = Integer.MAX_VALUE;
         int width;
         int height;
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             width = rectangles[i][0];
             height = rectangles[i][1];
-            bestArea += width * height;
-            if(smallestX > width)
+            if (smallestX > width)
                 smallestX = width;
-            if(smallestY > height)
-                smallestY =  height;
+            if (smallestY > height)
+                smallestY = height;
         }
     }
 
     public Grids solve() {
         ArrayList<Grids> list = new ArrayList<>();
-        for(int i = 0; i < 20; i++) {
+        for (int i = 0; i < 20; i++) {
             Grids g = initialize();
             list.add(g);
         }
-        for(int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++) {
             list = crossOver(list);
             list = select(list);
         }
@@ -50,6 +47,7 @@ public class Genetic {
 
         return list.get(0);
     }
+
     private Grids initialize() {
         String[] s = encode();
         List<String> list = Arrays.asList(s);
@@ -57,111 +55,124 @@ public class Genetic {
         list.toArray(s);
         Grids g = new Grids(s);
         mutate(g);
-        while(!fitness(g));
+        while (!fitness(g)) ;
 
         return g;
     }
+
     private String[] encode() {
         String[] arr = new String[size];
-        for(int i = 1; i <= size; i++) {
+        for (int i = 1; i <= size; i++) {
             arr[i - 1] = i + "f";
         }
 
         return arr;
     }
+
     private void mutate(Grids g) {
-        if(Math.random() < 0.15) {
-            String temp = g.s[(int) (Math.random() * size)];
-            if(temp.charAt(1) == 't') {
+        if (Math.random() < 0.25) {
+            int num = (int) (Math.random() * size);
+            String temp = g.s[num];
+            if (temp.charAt(1) == 't') {
                 temp = temp.replace('t', 'f');
-            }
-            else {
+            } else {
                 temp = temp.replace('f', 't');
             }
+            g.s[num] = temp;
         }
     }
 
     private ArrayList<Grids> select(ArrayList<Grids> list) {
         Collections.sort(list);
         ArrayList<Grids> newList = new ArrayList<>();
-        for(int i = 0; i < selectionAmount; i++)
+        for (int i = 0; i < selectionAmount; i++)
             newList.add(list.get(i));
-
+        xgrid = newList.get(0).x;
+        ygrid = newList.get(0).y;
         return newList;
     }
 
-//    pdfde detaylı anlatmış sayfa 27
+    //    pdfde detaylı anlatmış sayfa 27
     private ArrayList<Grids> crossOver(ArrayList<Grids> list) {
         ArrayList<Grids> newList = new ArrayList<>();
         int lsize = list.size();
-        for(int i = 0; i < lsize; i++)
-            for(int j = i + 1; j < lsize; j++) {
+        for (int i = 0; i < lsize; i++)
+            for (int j = i + 1; j < lsize; j++) {
                 String[] s1 = list.get(i).s;
                 String[] s2 = list.get(j).s;
                 int start = (int) (Math.random() * (size - 2));
                 int end = start + 2;
                 int[] keeper = new int[size - 2];
                 int z = 0;
-                for(int k = 0; k < size; k++) {
-                    if(s2[k].charAt(0) != s1[start + 1].charAt(0) && s2[k].charAt(0) != s1[end].charAt(0)) {
+                for (int k = 0; k < size; k++) {
+                    if (s2[k].charAt(0) != s1[start + 1].charAt(0) && s2[k].charAt(0) != s1[end].charAt(0)) {
                         keeper[z] = k;
                         z++;
                     }
                 }
 
                 z = 0;
-                for(int k = 0; k <= start; k++) {
+                for (int k = 0; k <= start; k++) {
                     s1[k] = s2[keeper[z]];
                     z++;
                 }
 
-                for(int k = end + 1; k < size; k++) {
+                for (int k = end + 1; k < size; k++) {
                     s1[k] = s2[keeper[z]];
                     z++;
                 }
 
                 Grids g = new Grids(s1);
-                while(!fitness(g));
+                while (!fitness(g)) ;
                 mutate(g);
                 newList.add(g);
             }
         return newList;
     }
 
-    private boolean fitness(Grids g) {
+    public boolean fitness(Grids g) {
         String[] s = g.s;
         ArrayList<Pair> points = new ArrayList<>();
+        ArrayList<Rect> rectArrayList = new ArrayList<>();
         points.add(new Pair(0, 0));
-        int sum = 0;
-        int area;
+        boolean ifchecked;
+        boolean take;
 
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             int index = Integer.parseInt(s[i].charAt(0) + "") - 1;
             int rectx = rectangles[index][WIDTH];
             int recty = rectangles[index][HEIGHT];
-            area = rectx * recty;
-            if(s[i].charAt(1) == 't') {
+            if (s[i].charAt(1) == 't') {
                 int temp = rectx;
                 rectx = recty;
                 recty = temp;
             }
-            
-            boolean donttake = true;
+
+            take = false;
             Collections.sort(points);
             int psize = points.size();
-            for(int j = 0; j < psize; j++) {
+
+            for (int j = 0; j < psize; j++) {
                 Pair p = points.get(j);
-                if(p.x + rectx <= xgrid && p.y + recty <= ygrid && (xgrid * ygrid - sum) > area) {
-                    donttake = false;
+                Rect rect = new Rect(p.x, p.y, rectx, recty);
+                rectArrayList.add(rect);
+                ifchecked = Rect.checkOverlap(rectArrayList);
+                if(!(p.x + rectx <= xgrid && p.y + recty <= ygrid)){
+                    take = false;
+                    break;
+                }
+                if (!ifchecked) {
+                    take = true;
                     points.add(new Pair(p.x + rectx, p.y));
                     points.add(new Pair(p.x, p.y + recty));
                     points.remove(p);
-                    sum += area;
                     break;
                 }
+                rectArrayList.remove(rect);
             }
-            if(donttake) {
+            if (!take) {
                 System.out.println("the grid size is not enough!");
+                System.out.println(xgrid + "   " + ygrid);
                 increaseGridSize();
                 return false;
             }
@@ -170,20 +181,21 @@ public class Genetic {
         int x_max = 0;
         int y_max = 0;
 
-        for(Pair p : points) {
-            if(x_max < p.x)
+        for (Pair p : points) {
+            if (x_max < p.x)
                 x_max = p.x;
-            if(y_max < p.y) {
+            if (y_max < p.y) {
                 y_max = p.y;
             }
         }
         g.x = x_max;
         g.y = y_max;
         g.area = x_max * y_max;
-        System.out.printf(g.toString());
-        decreaseGridSize();
+        System.out.println(g);
+        //decreaseGridSize();
         return true;
     }
+
 
     private void increaseGridSize() {
         xgrid += smallestX;
@@ -197,28 +209,62 @@ public class Genetic {
 
 }
 
+class Rect{
+    protected int x;
+    protected int y;
+    protected int width;
+    protected int height;
+
+    public  Rect(int x, int y, int width, int height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+
+    private boolean check(Rect other) {
+            boolean xOverlap = this.x < (other.x + other.width) && (this.x + this.width) > other.x;
+            boolean yOverlap = this.y < (other.y + other.height) && (this.y + this.height) > other.y;
+
+            return xOverlap && yOverlap;
+    }
+
+    public static boolean checkOverlap(ArrayList<Rect> list) {
+        int size = list.size();
+        for(int i = 0; i < size; i++)
+            for(int j = i + 1; j < size; j++) {
+                if(list.get(i).check(list.get(j)))
+                    return true;
+            }
+        return false;
+    }
+}
 class Pair implements Comparable<Pair> {
     protected int x;
     protected int y;
+
     public Pair(int x, int y) {
         this.x = x;
         this.y = y;
     }
+
     @Override
     public int compareTo(Pair other) {
-        if(x < other.x)
+        /*if (x < other.x)
             return -1;
-        else if(x > other.x)
+        else if (x > other.x)
             return 1;
         else {
-            if(y < other.y) {
+            if (y < other.y) {
                 return -1;
-            }
-            else if(y > other.y)
+            } else if (y > other.y)
                 return 1;
-        }
+        }*/
 
-        return 0;
+        if(x + y < other.x + other.y)
+            return -1;
+        else
+            return 1;
     }
 
     @Override
@@ -227,7 +273,7 @@ class Pair implements Comparable<Pair> {
     }
 }
 
-class Grids implements Comparable<Grids>{
+class Grids implements Comparable<Grids> {
     protected String[] s;
     protected int x = -1;
     protected int y = 1;
@@ -242,19 +288,19 @@ class Grids implements Comparable<Grids>{
     @Override
     public int compareTo(Grids o) {
         // check for uncompleted grids
-        if(this.area == -1) {
+        if (this.area == -1) {
             System.out.println("First item doesn't have area!");
             return -2;
         }
-        if(o.area == -1) {
+        if (o.area == -1) {
             System.out.println("Second item doesn't have area!");
             return -2;
         }
 
         //compare logic
-        if(this.area > o.area)
+        if (this.area > o.area)
             return 1;
-        else if(this.area < o.area)
+        else if (this.area < o.area)
             return -1;
 
         return 0;
@@ -264,7 +310,7 @@ class Grids implements Comparable<Grids>{
     public String toString() {
         String result = new String("Encode : ");
         int size = s.length;
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             result += s[i] + " ";
         }
 
