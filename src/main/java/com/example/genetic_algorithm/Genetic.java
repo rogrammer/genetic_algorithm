@@ -1,7 +1,17 @@
 package com.example.genetic_algorithm;
 
 import java.util.*;
-
+/**
+ * WIDTH diktörtgenin x ekseni için
+ * HEIGHT dikdörtgenin y ekseni için
+ * selection amount genetic algoritmada önce crossover ile nesiller oluşturyorsun
+ * sonra da bundan en iyilerini seçiyorsun bu o seçim miktarı
+ * rectangles [dikdöretgen sayısı][genişlik ve uzunluğundan] oluşan bir array
+ * size kaç dikdörtgen olduğu
+ * xgrid ygrid 150 diye aldığımız küçükse arttırıyoruz en dıştakini genişlik ve uzunluğu
+ * smallest olanlar da arttırma mikdarını belirlemek için eğer en dıştaki dikdörtgen küöçük ise onun
+ * x eksenini en küçük dikdörtgen genişliği ile y sini de en küçük dikdortgen uzunluğu miktarında arttrıyoruz
+ * */
 public class Genetic {
     private final int WIDTH = 0;
     private final int HEIGHT = 1;
@@ -22,6 +32,8 @@ public class Genetic {
         smallestY = Integer.MAX_VALUE;
         int width;
         int height;
+
+//        smallestları burda buluyoruz
         for (int i = 0; i < size; i++) {
             width = rectangles[i][0];
             height = rectangles[i][1];
@@ -31,7 +43,18 @@ public class Genetic {
                 smallestY = height;
         }
     }
-
+/**
+ * bu çözümü yapan fonksiyon
+ * ilk satırda bir list oluşturuyor sonra
+ * initializede 20 tane grid oluşturuyor
+ * grid en dıştaki dikdörtgen ama büyüklüğünü fitnessda hesaplıyoruz yani xgrid ve ygrid ile aynı değil
+ * gridin içinde aynı zamanda bir string array tutuyoruz ["1f", "2f", "3f"] gibi sayılar dikörtgenleri
+ * t ve f dönderilmiş mi değil mi onu tutuyor t dönderilmiş demek
+ * en altta Grid classı var
+ * 100 olan for dögüsü crosover ile 20 tane gridi birbiri arasında çaprazlıyo sonra select ile en iyi
+ * 10 tanesini seçiyor selectionAmount onun için
+ * en alttaki sort da sıralıyor en iyisini seçip ona dönüyor
+ * */
     public Grids solve() {
         ArrayList<Grids> list = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -47,7 +70,14 @@ public class Genetic {
 
         return list.get(0);
     }
-
+/**
+ * encode() da ["1f", "2f", "3t" ....] için kaç tane dikdörtgen varsa
+ * bu bize crossover yaparken kolaylık sağlıyor
+ *shuffle karıştırıyor sadece
+ * mutate de 0.25 olasılık ile f yi t ya da t yi f yapıyor
+ * gende mutasyon yapıyo
+ * fitness de yerleşene kadar yerleştirmeye çalışıyor
+ * */
     private Grids initialize() {
         String[] s = encode();
         List<String> list = Arrays.asList(s);
@@ -92,7 +122,11 @@ public class Genetic {
         return newList;
     }
 
-    //    pdfde detaylı anlatmış sayfa 27
+  /**
+   *  pdfde detaylı anlatmış sayfa 27
+   *  pdf i gite atarım
+   *  onun aynısını yaptım sayılır
+  * */
     private ArrayList<Grids> crossOver(ArrayList<Grids> list) {
         ArrayList<Grids> newList = new ArrayList<>();
         int lsize = list.size();
@@ -130,18 +164,31 @@ public class Genetic {
         return newList;
     }
 
+/**
+ * firness EN ÖNEMLİSİ BÜYÜK İHTİMALLE HATA BURDA HATTA KESİN BURADA
+ * Pair class dikdörtgenlerin köşesini tutuyor
+ * Rect dikdörtgenleri tutmak için bunu sadece overlapi önlemek için kullanıyoruz
+ * ifcheked overlap var mı diye bakıyor eğer true ise var demek
+ * take yerleşme başarılı mı diye bakıyor eğer başarılı ise true oluyor
+ * fitnessın mantığın birazıda pdf deki pseudo koddan
+* */
     public boolean fitness(Grids g) {
         String[] s = g.s;
         ArrayList<Pair> points = new ArrayList<>();
         ArrayList<Rect> rectArrayList = new ArrayList<>();
+
+//  ilk noktalara (0, 0) ı ekle
         points.add(new Pair(0, 0));
         boolean ifchecked;
         boolean take;
 
+//  dikdörtgenlerin hepsini dön
         for (int i = 0; i < size; i++) {
             int index = Integer.parseInt(s[i].charAt(0) + "") - 1;
-            int rectx = rectangles[index][WIDTH];
-            int recty = rectangles[index][HEIGHT];
+            int rectx = rectangles[index][WIDTH]; // bir dikdörtgenin genişliğini al
+            int recty = rectangles[index][HEIGHT];// uzunluğunu al
+
+//      eğer dönderilmiş ise genişlik ve uzunluğu yer değiştir
             if (s[i].charAt(1) == 't') {
                 int temp = rectx;
                 rectx = recty;
@@ -151,25 +198,33 @@ public class Genetic {
             take = false;
             Collections.sort(points);
             int psize = points.size();
-
+//      pair sayısı kadar dönder
             for (int j = 0; j < psize; j++) {
                 Pair p = points.get(j);
                 Rect rect = new Rect(p.x, p.y, rectx, recty);
                 rectArrayList.add(rect);
+//                dikdörtgenler overlap yapmış mı bakıyo
                 ifchecked = Rect.checkOverlap(rectArrayList);
+                rectArrayList.remove(rect);
+
+//                eğer dikdörtgen sığmıyacak ise loop u bitir yerleştiremedim de take ile
                 if(!(p.x + rectx <= xgrid && p.y + recty <= ygrid)){
                     take = false;
                     break;
                 }
+//                eğer overlap yok ise yerleştir
                 if (!ifchecked) {
                     take = true;
+//                    yeni iki noktayı ekle (0,0) dan sonra (0,16) (16,0) gibi yani köşede olan üçüncüyü ekleme
                     points.add(new Pair(p.x + rectx, p.y));
                     points.add(new Pair(p.x, p.y + recty));
+//                    (0,0) ı kaldır pair arraylistinden points den
                     points.remove(p);
+                    rectArrayList.add(rect);
                     break;
                 }
-                rectArrayList.remove(rect);
             }
+//            yerleştiremez ise en dıştaki dikdörtgen boyutunu arttır
             if (!take) {
                 System.out.println("the grid size is not enough!");
                 System.out.println(xgrid + "   " + ygrid);
@@ -188,6 +243,8 @@ public class Genetic {
                 y_max = p.y;
             }
         }
+
+//        en dıştaki dikdörtgeni hesapla
         g.x = x_max;
         g.y = y_max;
         g.area = x_max * y_max;
@@ -202,10 +259,6 @@ public class Genetic {
         ygrid += smallestY;
     }
 
-    private void decreaseGridSize() {
-        xgrid -= smallestX;
-        ygrid -= smallestY;
-    }
 
 }
 
@@ -222,6 +275,9 @@ class Rect{
         this.height = height;
     }
 
+    /**
+     * iki dikdörtgen al x ve y leri arasındaki fark genişlik ve uzunluk kadar mı bak
+     * */
     private boolean check(Rect other) {
             boolean xOverlap = this.x < (other.x + other.width) && (this.x + this.width) > other.x;
             boolean yOverlap = this.y < (other.y + other.height) && (this.y + this.height) > other.y;
@@ -229,6 +285,7 @@ class Rect{
             return xOverlap && yOverlap;
     }
 
+//    bütün dikdörtgenler için yap check() i
     public static boolean checkOverlap(ArrayList<Rect> list) {
         int size = list.size();
         for(int i = 0; i < size; i++)

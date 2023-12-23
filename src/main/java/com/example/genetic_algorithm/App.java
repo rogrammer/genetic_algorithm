@@ -11,6 +11,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
+/**
+ * burda sadece input alıyoruz ve diğer çağırmalar filan var önermli kısın Genetic.java
+ * Controller.java ve fxml dosyası çizim için
+ * sadece Controllerda add rectangleda çizim yapıyoruz fitness ile aynı sayılır
+ * eğer Genetic.java da fitnessı değiştirirsen onu da değiştir bir tuhaflık olursa
+* */
 public class App extends Application {
 
     @Override
@@ -24,6 +30,8 @@ public class App extends Application {
                     rectangles[i][j] = input.nextInt();
                 }
             }
+
+//          x ve y ilk içine yerleştireceğimiz dikdörtgenin boyutu bunu increaseGridSize() ile arttıyoruz eğer küçük ise
             Genetic genetic = new Genetic(rectangles, 150, 150);
             Grids g = genetic.solve();
             System.out.println(genetic.fitness(g));
