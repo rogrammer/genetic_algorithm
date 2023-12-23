@@ -128,13 +128,6 @@ public class Genetic {
         return newList;
     }
 
-    /**
-     * dikdortgenlerin yerleştirdikten sonra fitness değerini hesapla
-     * fitness değeri aldığın dikdörtgenin etrafını saran alan - bestArea olur sanırım
-     * amaç fittest olanı bulmak
-     * ve bulamdan önce büyük dikdörtgeni oluştur
-     * bunu da pdf de 7.3 de işaretledim
-     */
     private boolean fitness(Grids g) {
         String[] s = g.s;
         ArrayList<Pair> points = new ArrayList<>();
