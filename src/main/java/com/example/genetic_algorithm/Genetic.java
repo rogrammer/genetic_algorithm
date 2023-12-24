@@ -20,8 +20,8 @@ public class Genetic {
     private int size;
     private int smallestX;
     private int smallestY;
-    public int xgrid;
-    public int ygrid;
+    private int xgrid;
+    private int ygrid;
 
     public Genetic(int[][] rectangles, int x, int y) {
         this.rectangles = rectangles;
@@ -66,7 +66,6 @@ public class Genetic {
             list = select(list);
         }
         Collections.sort(list);
-        System.out.printf(list.get(0).toString());
 
         return list.get(0);
     }
@@ -172,7 +171,7 @@ public class Genetic {
  * take yerleşme başarılı mı diye bakıyor eğer başarılı ise true oluyor
  * fitnessın mantığın birazıda pdf deki pseudo koddan
 * */
-    public boolean fitness(Grids g) {
+    private boolean fitness(Grids g) {
         String[] s = g.s;
         ArrayList<Pair> points = new ArrayList<>();
         ArrayList<Rect> rectArrayList = new ArrayList<>();
@@ -221,7 +220,6 @@ public class Genetic {
 //            yerleştiremez ise en dıştaki dikdörtgen boyutunu arttır
             if (!taked) {
                 System.out.println("the grid size is not enough!");
-                System.out.println(xgrid + "   " + ygrid);
                 increaseGridSize();
                 return false;
             }
@@ -242,8 +240,6 @@ public class Genetic {
         g.x = x_max;
         g.y = y_max;
         g.area = x_max * y_max;
-        System.out.println(g);
-        //decreaseGridSize();
         return true;
     }
 
