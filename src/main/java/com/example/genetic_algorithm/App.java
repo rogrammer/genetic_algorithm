@@ -31,17 +31,12 @@ public class App extends Application {
                 }
             }
 
-//          x ve y ilk içine yerleştireceğimiz dikdörtgenin boyutu bunu increaseGridSize() ile arttıyoruz eğer küçük ise
-            Genetic genetic = new Genetic(rectangles, 50, 50);
-            Grids g = genetic.solve();
-            System.out.println(genetic.fitness(g));
-
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("view.fxml"));
             Parent root = fxmlLoader.load();
 //        Group group = new Group();
 //        group.getChildren().add(fxmlLoader.load());
             Controller controller = fxmlLoader.getController();
-            controller.addRectangle(rectangles, g);
+            controller.addRectangle(rectangles);
             Scene scene = new Scene(root, 700, 600);
             stage.setTitle("Genetic Algorthim AI");
             stage.setScene(scene);

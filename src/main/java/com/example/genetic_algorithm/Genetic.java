@@ -18,10 +18,10 @@ public class Genetic {
     private final int selectionAmount = 10;
     private int[][] rectangles;
     private int size;
-    private int xgrid;
-    private int ygrid;
     private int smallestX;
     private int smallestY;
+    public int xgrid;
+    public int ygrid;
 
     public Genetic(int[][] rectangles, int x, int y) {
         this.rectangles = rectangles;
@@ -212,6 +212,7 @@ public class Genetic {
                         taked = true;
                         points.add(new Pair(p.x + rectx, p.y));
                         points.add(new Pair(p.x, p.y + recty));
+                        g.rectArrayList.add(rect);
                         points.remove(p);
                         break;
                     }
@@ -286,8 +287,6 @@ class Rect{
 
             /*boolean xOverlap = this.x < (other.x + other.width) && other.x < (this.x + this.width);
             boolean yOverlap = this.y < (other.y + other.height) && other.y < (this.y + this.height);*/
-        System.out.println(this + "\n" + other + " " + xoverlap);
-        System.out.println();
         return xoverlap;
     }
 
@@ -297,7 +296,6 @@ class Rect{
         for(int i = 0; i < size; i++)
             for(int j = i + 1; j < size; j++) {
                 if(list.get(i).check(list.get(j))) {
-                    System.out.println("Overlap detected between rectangles " + i + " and " + j);
                     return true;
                 }
             }
@@ -309,6 +307,8 @@ class Rect{
         return "x: " + x + " y: " + y + " width: " + width + " height: " + height;
     }
 }
+
+
 class Pair implements Comparable<Pair> {
     protected int x;
     protected int y;
@@ -341,10 +341,12 @@ class Pair implements Comparable<Pair> {
     }
 }
 
+
 class Grids implements Comparable<Grids> {
     protected String[] s;
     protected int x = -1;
     protected int y = 1;
+    protected ArrayList<Rect> rectArrayList = new ArrayList<>();
 
     protected int area;
 

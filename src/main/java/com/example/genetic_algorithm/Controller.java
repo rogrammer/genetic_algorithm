@@ -12,51 +12,20 @@ public class Controller {
     private Pane rectangleContainer;
     @FXML
 
-    public void addRectangle(int[][] rectangles, Grids g) {
-        int num = g.s.length;
-        ArrayList<Rect> rectArrayList = new ArrayList<>();
-        int size = g.s.length;
+    public void addRectangle(int[][] rectangles) {
+        Genetic genetic = new Genetic(rectangles, 50, 50);
+        Grids g = genetic.solve();
 
+        int size = g.rectArrayList.size();
         Rectangle grid = new Rectangle(0, 0, g.x, g.y);
+        rectangleContainer.getChildren().add(grid);
         grid.setFill(Color.TRANSPARENT);
         grid.setStroke(Color.BLACK);
-        rectangleContainer.getChildren().add(grid);
+        for(Rect r : g.rectArrayList) {
+            Rectangle rectangle = new Rectangle(r.x, r.y, r.width, r.height);
+            rectangle.setFill(getRandomColor());
+            rectangleContainer.getChildren().add(rectangle);
 
-        String[] s = g.s;
-        ArrayList<Pair> points = new ArrayList<>();
-        points.add(new Pair(0, 0));
-        boolean ifchecked = false;
-        for (int i = 0; i < size; i++) {
-            int index = Integer.parseInt(s[i].charAt(0) + "") - 1;
-            int rectx = rectangles[index][0];
-            int recty = rectangles[index][1];
-            if (s[i].charAt(1) == 't') {
-                int temp = rectx;
-                rectx = recty;
-                recty = temp;
-            }
-
-            Collections.sort(points);
-            int psize = points.size();
-            for (int j = 0; j < psize; j++) {
-                Pair p = points.get(j);
-
-                if(p.x + rectx <= g.x && p.y + recty <= g.y) {
-                    Rect rect = new Rect(p.x, p.y, rectx, recty);
-                    rectArrayList.add(rect);
-                    ifchecked = Rect.checkOverlap(rectArrayList);
-                    if(ifchecked) {
-                        rectArrayList.remove(rect);
-                    } else {
-                        points.add(new Pair(p.x + rectx, p.y));
-                        points.add(new Pair(p.x, p.y + recty));
-                        Rectangle r = new Rectangle(p.x, p.y, rectx, recty);
-                        r.setFill(getRandomColor());
-                        rectangleContainer.getChildren().add(r);
-                        break;
-                    }
-                }
-            }
         }
     }
 
@@ -64,7 +33,7 @@ public class Controller {
         double red = Math.random();
         double green = Math.random();
         double blue = Math.random();
-        if(red == 1 && green == 1 && blue == 1) {
+        if(red == 1.0 && green == 1.0 && blue == 1.0) {
             Color.color(1.0, 0, 0);
         }
 
