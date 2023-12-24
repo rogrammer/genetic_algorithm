@@ -15,7 +15,7 @@ import java.util.*;
 public class Genetic {
     private final int WIDTH = 0;
     private final int HEIGHT = 1;
-    private final int selectionAmount = 10;
+    private final int selectionAmount = 50;
     private int[][] rectangles;
     private int size;
     private int smallestX;
@@ -57,12 +57,15 @@ public class Genetic {
  * */
     public Grids solve() {
         ArrayList<Grids> list = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
+        ArrayList<Grids> newList = new ArrayList<>();
+        for (int i = 0; i < 200; i++) {
             Grids g = initialize();
             list.add(g);
         }
-        for (int i = 0; i < 100; i++) {
-            list = crossOver(list);
+
+        for (int i = 0; i < 300; i++) {
+            newList = crossOver(list);
+            list.addAll(newList);
             list = select(list);
         }
         Collections.sort(list);
