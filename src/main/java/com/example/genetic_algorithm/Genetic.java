@@ -57,11 +57,11 @@ public class Genetic {
  * */
     public Grids solve() {
         ArrayList<Grids> list = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 20; i++) {
             Grids g = initialize();
             list.add(g);
         }
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             list = crossOver(list);
             list = select(list);
         }
@@ -219,7 +219,6 @@ public class Genetic {
             }
 //            yerleştiremez ise en dıştaki dikdörtgen boyutunu arttır
             if (!taked) {
-                System.out.println("the grid size is not enough!");
                 increaseGridSize();
                 return false;
             }
