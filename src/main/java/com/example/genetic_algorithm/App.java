@@ -32,7 +32,7 @@ public class App extends Application {
             }
 
 //          x ve y ilk içine yerleştireceğimiz dikdörtgenin boyutu bunu increaseGridSize() ile arttıyoruz eğer küçük ise
-            Genetic genetic = new Genetic(rectangles, 150, 150);
+            Genetic genetic = new Genetic(rectangles, 50, 50);
             Grids g = genetic.solve();
             System.out.println(genetic.fitness(g));
 

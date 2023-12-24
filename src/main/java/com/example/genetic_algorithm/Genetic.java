@@ -57,11 +57,11 @@ public class Genetic {
  * */
     public Grids solve() {
         ArrayList<Grids> list = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 5; i++) {
             Grids g = initialize();
             list.add(g);
         }
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             list = crossOver(list);
             list = select(list);
         }
@@ -180,7 +180,7 @@ public class Genetic {
 //  ilk noktalara (0, 0) ı ekle
         points.add(new Pair(0, 0));
         boolean ifchecked;
-        boolean take;
+        boolean taked;
 
 //  dikdörtgenlerin hepsini dön
         for (int i = 0; i < size; i++) {
@@ -195,37 +195,30 @@ public class Genetic {
                 recty = temp;
             }
 
-            take = false;
+            taked = false;
             Collections.sort(points);
             int psize = points.size();
 //      pair sayısı kadar dönder
             for (int j = 0; j < psize; j++) {
                 Pair p = points.get(j);
-                Rect rect = new Rect(p.x, p.y, rectx, recty);
-                rectArrayList.add(rect);
-//                dikdörtgenler overlap yapmış mı bakıyo
-                ifchecked = Rect.checkOverlap(rectArrayList);
-                rectArrayList.remove(rect);
 
-//                eğer dikdörtgen sığmıyacak ise loop u bitir yerleştiremedim de take ile
-                if(!(p.x + rectx <= xgrid && p.y + recty <= ygrid)){
-                    take = false;
-                    break;
-                }
-//                eğer overlap yok ise yerleştir
-                if (!ifchecked) {
-                    take = true;
-//                    yeni iki noktayı ekle (0,0) dan sonra (0,16) (16,0) gibi yani köşede olan üçüncüyü ekleme
-                    points.add(new Pair(p.x + rectx, p.y));
-                    points.add(new Pair(p.x, p.y + recty));
-//                    (0,0) ı kaldır pair arraylistinden points den
-                    points.remove(p);
+                if(p.x + rectx <= xgrid && p.y + recty <= ygrid) {
+                    Rect rect = new Rect(p.x, p.y, rectx, recty);
                     rectArrayList.add(rect);
-                    break;
+                    ifchecked = Rect.checkOverlap(rectArrayList);
+                    if(ifchecked) {
+                        rectArrayList.remove(rect);
+                    } else {
+                        taked = true;
+                        points.add(new Pair(p.x + rectx, p.y));
+                        points.add(new Pair(p.x, p.y + recty));
+                        points.remove(p);
+                        break;
+                    }
                 }
             }
 //            yerleştiremez ise en dıştaki dikdörtgen boyutunu arttır
-            if (!take) {
+            if (!taked) {
                 System.out.println("the grid size is not enough!");
                 System.out.println(xgrid + "   " + ygrid);
                 increaseGridSize();
@@ -279,10 +272,23 @@ class Rect{
      * iki dikdörtgen al x ve y leri arasındaki fark genişlik ve uzunluk kadar mı bak
      * */
     private boolean check(Rect other) {
-            boolean xOverlap = this.x < (other.x + other.width) && (this.x + this.width) > other.x;
-            boolean yOverlap = this.y < (other.y + other.height) && (this.y + this.height) > other.y;
+        boolean xoverlap = true;
+        if(this.x >= other.x + other.width)
+            xoverlap = false;
+        if(other.x >= this.x + this.width)
+            xoverlap = false;
 
-            return xOverlap && yOverlap;
+        if(this.y >= other.y + other.height)
+            xoverlap = false;
+        if(other.y >= this.y + this.height)
+            xoverlap = false;
+
+
+            /*boolean xOverlap = this.x < (other.x + other.width) && other.x < (this.x + this.width);
+            boolean yOverlap = this.y < (other.y + other.height) && other.y < (this.y + this.height);*/
+        System.out.println(this + "\n" + other + " " + xoverlap);
+        System.out.println();
+        return xoverlap;
     }
 
 //    bütün dikdörtgenler için yap check() i
@@ -290,10 +296,17 @@ class Rect{
         int size = list.size();
         for(int i = 0; i < size; i++)
             for(int j = i + 1; j < size; j++) {
-                if(list.get(i).check(list.get(j)))
+                if(list.get(i).check(list.get(j))) {
+                    System.out.println("Overlap detected between rectangles " + i + " and " + j);
                     return true;
+                }
             }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "x: " + x + " y: " + y + " width: " + width + " height: " + height;
     }
 }
 class Pair implements Comparable<Pair> {
@@ -312,12 +325,10 @@ class Pair implements Comparable<Pair> {
         else if (x > other.x)
             return 1;
         else {
-            if (y < other.y) {
+            if (y < other.y)
                 return -1;
-            } else if (y > other.y)
-                return 1;
-        }*/
-
+        }
+        return 1;*/
         if(x + y < other.x + other.y)
             return -1;
         else

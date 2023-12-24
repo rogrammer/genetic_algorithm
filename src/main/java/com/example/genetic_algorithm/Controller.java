@@ -40,20 +40,22 @@ public class Controller {
             int psize = points.size();
             for (int j = 0; j < psize; j++) {
                 Pair p = points.get(j);
-                Rect rect = new Rect(p.x, p.y, rectx, recty);
-                rectArrayList.add(rect);
-                if(j != 0)
+
+                if(p.x + rectx <= g.x && p.y + recty <= g.y) {
+                    Rect rect = new Rect(p.x, p.y, rectx, recty);
+                    rectArrayList.add(rect);
                     ifchecked = Rect.checkOverlap(rectArrayList);
-                points.remove(p);
-                if (!ifchecked) {
-                    points.add(new Pair(p.x + rectx, p.y));
-                    points.add(new Pair(p.x, p.y + recty));
-                    Rectangle r = new Rectangle(p.x, p.y, rectx, recty);
-                    r.setFill(getRandomColor());
-                    rectangleContainer.getChildren().add(r);
-                    break;
+                    if(ifchecked) {
+                        rectArrayList.remove(rect);
+                    } else {
+                        points.add(new Pair(p.x + rectx, p.y));
+                        points.add(new Pair(p.x, p.y + recty));
+                        Rectangle r = new Rectangle(p.x, p.y, rectx, recty);
+                        r.setFill(getRandomColor());
+                        rectangleContainer.getChildren().add(r);
+                        break;
+                    }
                 }
-                rectArrayList.remove(rect);
             }
         }
     }
