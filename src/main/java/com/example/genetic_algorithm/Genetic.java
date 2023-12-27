@@ -22,12 +22,18 @@ public class Genetic {
     private int smallestY;
     private int xgrid;
     private int ygrid;
+    public static int bestArea = 0;
+
 
     public Genetic(int[][] rectangles, int x, int y) {
         this.rectangles = rectangles;
         size = rectangles.length;
         xgrid = x;
         ygrid = y;
+
+        for(int i = 0; i < size; i++) {
+            bestArea += rectangles[i][0] * rectangles[i][1];
+        }
         smallestX = Integer.MAX_VALUE;
         smallestY = Integer.MAX_VALUE;
         int width;
@@ -67,8 +73,9 @@ public class Genetic {
             newList = crossOver(list);
             list.addAll(newList);
             list = select(list);
+            Collections.sort(list);
+            System.out.println(list.get(0));
         }
-        Collections.sort(list);
 
         return list.get(0);
     }
@@ -382,9 +389,9 @@ class Grids implements Comparable<Grids> {
             result += s[i] + " ";
         }
 
-        result += "\nWidth of the rectangle: " + x;
-        result += "\nHeight of the rectangle: " + y;
-        result += "\nArea of the rectangle: " + area;
+        result += "\nInstant Area: " + area;
+        result += "\nBest Area: " + Genetic.bestArea;
+        result += "\nFitness: " + (area - Genetic.bestArea);
         result += "\n";
 
         return result;

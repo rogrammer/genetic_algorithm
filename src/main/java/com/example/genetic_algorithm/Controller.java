@@ -4,8 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import java.util.ArrayList;
-import java.util.Collections;
+
 
 public class Controller {
     @FXML
