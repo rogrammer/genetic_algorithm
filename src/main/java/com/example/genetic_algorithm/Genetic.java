@@ -49,6 +49,7 @@ public class Genetic {
                 smallestY = height;
         }
     }
+
 /**
  * bu çözümü yapan fonksiyon
  * ilk satırda bir list oluşturuyor sonra
